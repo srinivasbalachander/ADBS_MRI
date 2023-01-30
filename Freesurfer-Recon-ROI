@@ -3,3 +3,16 @@
 
 # Get list from within the folder
 ls -d1 $SUBJECTS_DIR/sub* | sed 's#.*/##'
+
+
+
+cat list.txt | parallel --jobs 64 recon-all -subjid {.}  -i {.}/ses-10?/anat/*ses-10?_run-01_T1w.n*  -T2 {.}/ses-10?/anat/*ses-10?_run-01_FLAIR.n* -FLAIR -all  
+
+
+# asegstats2table
+
+
+
+# aparcstats2table
+
+
