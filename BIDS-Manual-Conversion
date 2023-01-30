@@ -1,1 +1,107 @@
 # Get the BIDS parts of the Code here
+
+
+# NIFTI Conversion - for QC and BIDS folders
+
+# make a filelist.txt
+
+ls -d DICOMS/* > filelist.txt
+
+for subj in `cat filelist.txt`; do
+mkdir NiftiBIDS/${subj}
+done
+
+cat filelist.txt | parallel --jobs 24 dcm2niix -b y -ba n -z y -f '%f_%p' -o NiftiBIDS/{.} {.}
+
+# Get ADBS ID from NIfTi header
+
+for i in `cat ../filelist.txt`; do 
+ADBS_ID=`awk -F '"ProcedureStepDescription": ' '{print $2}' ${i}/*Survey*.json |grep -o '[0-9]\+'|awk 'NR==1{print $1}'`
+ANC_NUM=`awk -F '"AccessionNumber":' '{print $2}' ${i}/*Survey*.json |sed "s/[^[:alnum:]-]//g"|awk '!/^$/'| awk 'NR==1{print $1}'`
+UHID=`awk -F '"PatientID": ' '{print $2}' ${i}/*Survey*.json |sed "s/[^[:alnum:]-]//g"|awk '!/^$/'| awk 'NR==1{print $1}'` 
+NAME=`awk -F '"PatientName": ' '{print $2}' ${i}/*Survey*.json|sed "s/[^[:alnum:]-]//g"|awk '!/^$/' | awk 'NR==1{print $1}'`
+DATE=`awk -F '"AcquisitionDateTime": "' '{print $2}' ${i}/*Survey*.json | sed "s/[^[:alnum:]-]//g" | sed 's/T.*//' | awk '!/^$/' | awk 'NR==1{print $1}'`
+T1w=`find ${i} -name "*_T1w_2*.nii.gz" | wc -l`
+PSIR=`find ${i} -name "*_PSIR_2*.nii.gz" | wc -l`
+T2=`find ${i} -name "*T2w*.nii.gz" | wc -l`
+FLAIR=`find ${i} -name "*FLAIR*.nii.gz" | wc -l`
+rest=`find ${i} -name "*rest_bold*.nii.gz" | wc -l`
+vft=`find ${i} -name "*vft_bold*.nii.gz" | wc -l`
+trends=`find ${i} -name "*trends_bold*.nii.gz" | wc -l`
+dti=`find ${i} -name "*DTI_6dir*.nii.gz" | wc -l`
+dki=`find ${i} -name "*DKI*.nii.gz" | wc -l`
+echo -e "${i} \t $ANC_NUM \t $NAME \t $ADBS_ID \t $UHID \t $DATE \t $T1w \t $PSIR \t $T2 \t $FLAIR \t $rest \t $vft \t $trends \t $dti \t $dki"; done > ../NiftiQC.txt
+
+
+# Make a BIDS_rename.txt file, with folder_name ({ANC-ID}-{NAME}), ADBSID, and Session in 3 columns
+
+for i in  `cat filelist.txt`; do
+
+ADBSID=`awk -v i=$i -F ","  '{if($1==i)  print $2 }' ../BIDS_Rename.csv`
+SESNO=`awk -v i=$i -F ","  '{if($1==i)  print $3 }' ../BIDS_Rename.csv`
+SES=ses-${SESNO}
+SUBID=sub-${ADBSID}
+ 
+rename ${i} ${SUBID}  ${i}
+
+rename ${i} ${SUBID}_${SES} ${SUBID}/*
+
+rename T1w_PSIR PSIR ${SUBID}/*
+
+rename fieldmap_e1_ph phase1 ${SUBID}/*
+rename fieldmap_e2_ph phase2 ${SUBID}/*
+rename fieldmap_e1 magnitude1 ${SUBID}/*
+rename fieldmap_e2 magnitude2 ${SUBID}/*
+
+rename Ref_rest_ acq-rest_dir- ${SUBID}/*
+rename Ref_VFT_ acq-vft_dir- ${SUBID}/*
+rename Ref_TRENDS_ acq-trends_dir- ${SUBID}/*
+rename Ref_DWI_ acq-dwi_dir- ${SUBID}/*
+
+rename DKI acq-80dir_dwi ${SUBID}/*
+rename DTI_6dir acq-06dir_dwi ${SUBID}/*
+
+mkdir ${SUBID}/${SES}
+mkdir ${SUBID}/${SES}/anat
+mkdir ${SUBID}/${SES}/func
+mkdir ${SUBID}/${SES}/fmap
+mkdir ${SUBID}/${SES}/dwi
+mkdir ${SUBID}/${SES}/survey
+
+mv ${SUBID}/*Survey* ${SUBID}/${SES}/survey/
+
+mv ${SUBID}/*T1w*  ${SUBID}/${SES}/anat/
+mv ${SUBID}/*T2w*  ${SUBID}/${SES}/anat/
+mv ${SUBID}/*FLAIR*  ${SUBID}/${SES}/anat/
+mv ${SUBID}/*PSIR*  ${SUBID}/${SES}/anat/
+
+mv ${SUBID}/*_dir-* ${SUBID}/${SES}/fmap/
+mv ${SUBID}/*magnitude* ${SUBID}/${SES}/fmap/
+mv ${SUBID}/*phase* ${SUBID}/${SES}/fmap/
+
+mv ${SUBID}/*task-rest* ${SUBID}/${SES}/func/
+mv ${SUBID}/*task-vft* ${SUBID}/${SES}/func/
+mv ${SUBID}/*task-trends* ${SUBID}/${SES}/func/
+
+mv ${SUBID}/*06dir_dwi* ${SUBID}/${SES}/dwi/
+mv ${SUBID}/*80dir_dwi* ${SUBID}/${SES}/dwi/
+
+done
+
+
+# Copy all these NifTIBIDS folders to the Cluster
+
+Go to Cluster's SSH
+
+sftp root@10.11.1.164
+
+get -r <path to NiftiBIDS>
+
+
+# Copy the ses-111 folders to the parent ones
+
+# Make list of folders that have ses111
+
+ls -d */ses-111 > ses111list.txt
+sed 's,/ses-111,,g' ses111list.txt > ses111files.txt
+rm ses111list.txt
