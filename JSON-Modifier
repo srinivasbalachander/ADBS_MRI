@@ -1,1 +1,6 @@
 # Adding the line for the fMRI JSON files to specify the PhaseEncodeDirection for the dataset
+
+# Add a line for "PhaseEncodingDirection":"j" ---- figure out an awk way to do this for each json file to avoid a lot of pain in the future!
+
+find */*/func/*.json -exec  sed -i '/"PhaseEncodingAxis":"j",/a\\t"PhaseEncodingDirection":"j",' {} \;
+
