@@ -14,11 +14,9 @@ find . -maxdepth 1 -type d '!' -exec test -e "{}/stats/aseg.stats" ';' -print
 
 # asegstats2table
 
-
+asegstats2table --subjects  `cat list.structural.txt` --meas volume --skip --tablefile aseg_stats.txt 
 
 # aparcstats2table
 
-
-
-
-
+aparcstats2table --subjects `cat list.structural.txt`  --measure thickness --hemi lh --skip -t aparc.lh.txt
+aparcstats2table --subjects `cat list.structural.txt`  --measure thickness --hemi rh --skip -t aparc.rh.txt
