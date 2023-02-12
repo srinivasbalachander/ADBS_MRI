@@ -4,3 +4,8 @@
 
 find */*/func/*.json -exec  sed -i '/"PhaseEncodingAxis":"j",/a\\t"PhaseEncodingDirection":"j",' {} \;
 
+
+# If I feel like changing it from j to j-
+
+find */*/func/*.json -exec sed -i 's/"PhaseEncodingDirection":"j",/"PhaseEncodingDirection":"j-",/g' {} \;
+
