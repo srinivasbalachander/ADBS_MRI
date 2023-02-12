@@ -1,0 +1,3 @@
+# Command to call on HalfPIPE for Resting State Analysis
+
+singularity run --containall --bind /mnt/HPStorage/:/ext halfpipe-halfpipe-latest.sif --nipype-omp-nthreads 64 --nipype-memory-gb 128 --verbose
