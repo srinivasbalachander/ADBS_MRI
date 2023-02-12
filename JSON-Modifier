@@ -9,3 +9,8 @@ find */*/func/*.json -exec  sed -i '/"PhaseEncodingAxis":"j",/a\\t"PhaseEncoding
 
 find */*/func/*.json -exec sed -i 's/"PhaseEncodingDirection":"j",/"PhaseEncodingDirection":"j-",/g' {} \;
 
+
+# Calculate total read-out time
+
+https://osf.io/xvguw/wiki/home/
+
