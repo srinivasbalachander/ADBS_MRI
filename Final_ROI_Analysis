@@ -1,0 +1,91 @@
+# Using Braindr to plot the results in tksurfer
+### https://brainder.org/2011/07/05/freesurfer-brains-in-arbitrary-colours/
+
+
+
+library(lme4)
+library(lmerTest)
+library(effectsize)
+
+df_Phase1 <- read.csv("df_Phase1.csv")
+
+aseg <- read.table("MRI_Results/aseg_stats.txt", header = T, sep = "\t")
+
+# Analysis aparc volume files first
+aparc.lh <- read.table("MRI_Results/aparc.lh.volume.txt", header = T, sep = "\t")
+aparc.rh <- read.table("MRI_Results/aparc.rh.volume.txt", header = T, sep = "\t")
+
+aparc <- merge(aparc.lh[, startsWith(names(aparc.lh), "lh")], aparc.rh, 
+               by.x="lh.aparc.volume", by.y="rh.aparc.volume")  
+
+names(aparc)[1] <- "subjectID"
+names(aseg)[1] <- "subjectID"
+
+aparc$subjectID <- gsub(pattern = "sub-", replacement = "", x = aparc$subjectID)
+aseg$subjectID <- gsub(pattern = "sub-", replacement = "", x = aseg$subjectID)
+
+vars.aparc <- names(aparc)[-1]
+vars.aseg <- names(aseg)[-1]
+
+df.aparc <- merge(df_Phase1, aparc, by="subjectID")
+
+# Running the LME model for diagnosis
+lmes.aparc <- lapply(df.aparc[, vars.aparc], function(x) {
+              lmer(x ~ Pt_Age + Pt_Gender + 
+                        Diag_Schiz + Diag_BPAD + Diag_OCD + 
+                        Diag_SUD + Diag_AlzD + (1|Family_Number), data=df.aparc)} )
+
+effs.aparc <- lapply(lmes.aparc, effectsize)
+
+# Putting all the results together
+aparc.results <- data.frame(diag = rep(c("Diag_Schiz", "Diag_BPAD",
+                                         "Diag_OCD", "Diag_SUD", "Diag_AlzD"), 
+                                       each = length(vars.aparc)),
+                            label = rep(vars.aparc, times = 5), d=NA, p.uncor=NA, p.fdr=NA) 
+
+for(i in vars.aparc) {
+  for(j in c("Diag_Schiz", "Diag_BPAD",
+             "Diag_OCD", "Diag_SUD", "Diag_AlzD")){
+   
+    d = effs.aparc[[i]][effs.aparc[[i]]$Parameter == j, "Std_Coefficient"]
+    p = coef(summary(lmes.aparc[[i]]))[j, "Pr(>|t|)"]
+    
+    aparc.results[aparc.results$diag == j & aparc.results$label == i, "d"] <- d
+    aparc.results[aparc.results$diag == j & aparc.results$label == i, "p.uncor"] <- p
+  }
+}
+
+# Doing multiple comparison correction
+for(j in c("Diag_Schiz", "Diag_BPAD",
+           "Diag_OCD", "Diag_SUD", "Diag_AlzD")) {
+  
+  df.j <- aparc.results[aparc.results$diag == j,]
+  df.j$p.fdr <- p.adjust(df.j$p.uncor, method = "fdr")
+  
+  aparc.results[aparc.results$diag == j, "p.fdr"] <- df.j$p.fdr
+}
+
+
+aparc.results[,3:5] <- round(aparc.results[, 3:5], digits = 7)
+
+aparc.results$label <- gsub(pattern = "_volume", replacement = "", aparc.results$label)
+
+aparc.results$d2 <- ifelse(aparc.results$p.fdr >0.05, NA, aparc.results$d)
+
+# Plotting the results
+
+library(ggseg)
+library(ggplot2)
+library(dplyr)
+
+aparc.results  %>%
+  group_by(diag) %>%
+  ggplot() +
+  geom_brain(atlas = dk, color="black",
+             aes(fill = d2)) + scale_fill_gradient2(low="darkblue", 
+                                                    high="darkred", 
+                                                    mid = "green", 
+                                                    na.value = "gray",
+                                                    limits=c(-0.3,0.3)) +
+  theme_void() +
+  facet_wrap(~diag, ncol=1)
