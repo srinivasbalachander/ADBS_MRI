@@ -7,19 +7,39 @@ find */*/func/*.json -exec  sed -i '/"PhaseEncodingAxis":"j",/a\\t"PhaseEncoding
 
 # If I feel like changing it from j to j-
 
-find */*/func/*.json -exec sed -i 's/"PhaseEncodingDirection":"j",/"PhaseEncodingDirection":"j-",/g' {} \;
+find */*/func/*.json -exec sed -i 's/"PhaseEncodingDirection":"j-",/"PhaseEncodingDirection":"j",/g' {} \;
 
 
-# Add slice timing values (for resting state Inferior to Superior acquisitions only)
+# Add slice timing values (for resting state Inferior to Superior acquisitions, when TR=2.2seconds only)
 
-find */*/func/*rest*.json -exec
-sed -i 's/"InPlanePhaseEncodingDirectionDICOM": "COL",/&\n    "SliceTiming": [ \n\t 0.0, \n\t 0.05, \n\t 0.1, \n\t 0.15, \n\t 0.2, \n\t 0.25, \n\t 0.3, \n\t 0.35, \n\t 0.4, \n\t 0.45, \n\t 0.5, \n\t 0.55, \n\t 0.6, \n\t 0.65, \n\t 0.7, \n\t 0.75, \n\t 0.8, \n\t 0.85, \n\t 0.9, \n\t 0.95, \n\t 1.0, \n\t 1.05, \n\t 1.1, \n\t 1.15, \n\t 1.2, \n\t 1.25, \n\t  1.3, \n\t 1.35, \n\t 1.4, \n\t 1.45, \n\t 1.5, \n\t 1.55, \n\t 1.6, \n\t 1.65, \n\t 1.7, \n\t 1.75, \n\t 1.8, \n\t 1.85, \n\t 1.9, \n\t 1.95, \n\t 2.0, \n\t 2.05, \n\t 2.1, \n\t 2.15 \n\t ],/' {} \;
+find */*/func/*rest*.json -exec \
+sed -i 's/"InPlanePhaseEncodingDirectionDICOM":"COL",/&\n\t"SliceTiming":[0.0,\n\t0.05,\n\t0.1,\n\t0.15,\n\t0.2,\n\t0.25,\n\t0.3,\n\t0.35,\n\t0.4,\n\t0.45,\n\t0.5,\n\t0.55,\n\t0.6,\n\t0.65,\n\t0.7,\n\t0.75,\n\t0.8,\n\t0.85,\n\t0.9,\n\t0.95,\n\t1.0,\n\t1.05,\n\t1.1,\n\t1.15,\n\t1.2,\n\t1.25,\n\t1.3,\n\t1.35,\n\t1.4,\n\t1.45,\n\t1.5,\n\t1.55,\n\t1.6,\n\t1.65,\n\t1.7,\n\t1.75,\n\t1.8,\n\t1.85,\n\t1.9,\n\t1.95,\n\t2.0,\n\t2.05,\n\t2.1,\n\t2.15\n\t],/' {} \;
 
-find */*/func/*rest*.json -exec 
-sed -i 's/    "PhaseEncodingAxis": "j",/&\n    "PhaseEncodingDirection":"j", \n    "SliceEncodingDirection": "k",/' {} \;
 
+# Add PhaseEncodingAxis and Phase Encoding Directions
+
+find */*/func/*rest*.json -exec \
+sed -i 's/"PhaseEncodingAxis": "j",/&\n\t"PhaseEncodingDirection": "j",\n\t"SliceEncodingDirection": "k",/' {} \;
+
+# Add PhaseEncodingDirections in the AP and PA field maps as well
+
+find  */*/fmap/*AP*.json -exec \
+sed -i 's/"PhaseEncodingAxis":"j",/&\n\t"PhaseEncodingDirection": "j-",/' {} \;
+
+find  */*/fmap/*PA*.json -exec \
+sed -i 's/"PhaseEncodingAxis":"j",/&\n\t"PhaseEncodingDirection": "j",/' {} \;
 
 # Calculate total read-out time
 
 https://osf.io/xvguw/wiki/home/
+
+
+# Delete certain lines from the json file
+
+find  */*/fmap/*PA*.json -exec \
+sed -i '/PhaseEncodingDirection/d' {} \; 
+
+find  */*/fmap/*AP*.json -exec \
+sed -i '/PhaseEncodingDirection/d' {} \; 
+
 
