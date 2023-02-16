@@ -24,10 +24,10 @@ sed -i 's/"PhaseEncodingAxis": "j",/&\n\t"PhaseEncodingDirection": "j",\n\t"Slic
 # Add PhaseEncodingDirections in the AP and PA field maps as well
 
 find  */*/fmap/*AP*.json -exec \
-sed -i 's/"PhaseEncodingAxis":"j",/&\n\t"PhaseEncodingDirection": "j-",/' {} \;
+sed -i 's/"PhaseEncodingAxis": "j",/&\n\t"PhaseEncodingDirection": "j-",/' {} \;
 
 find  */*/fmap/*PA*.json -exec \
-sed -i 's/"PhaseEncodingAxis":"j",/&\n\t"PhaseEncodingDirection": "j",/' {} \;
+sed -i 's/"PhaseEncodingAxis": "j",/&\n\t"PhaseEncodingDirection": "j",/' {} \;
 
 # Calculate total read-out time
 
@@ -41,5 +41,19 @@ sed -i '/PhaseEncodingDirection/d' {} \;
 
 find  */*/fmap/*AP*.json -exec \
 sed -i '/PhaseEncodingDirection/d' {} \; 
+
+find  */*/func/*bold.json -exec \
+sed -i '/PhaseEncodingDirection/d' {} \; 
+
+find  */*/func/*bold.json -exec \
+sed -i '/SliceEncodingDirection/d' {} \; 
+
+# Adding a gap - HalfPipe seems to like it
+
+find */*/func/*.json -exec \
+sed -i 's/"PhaseEncodingAxis":"j",/"PhaseEncodingAxis": "j",/g' {} \;
+
+find */*/fmap/*.json -exec \
+sed -i 's/"PhaseEncodingAxis":"j",/"PhaseEncodingAxis": "j",/g' {} \;
 
 
