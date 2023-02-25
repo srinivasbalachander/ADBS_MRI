@@ -1,6 +1,13 @@
 # Using Braindr to plot the results in tksurfer
 ### https://brainder.org/2011/07/05/freesurfer-brains-in-arbitrary-colours/
 
+# Other options for better plotting:
+
+## -- Subcortical Plotting: https://ggseg.github.io/ggsegExtra/articles/createaseg.html
+
+## -- The ENIGMA Toolbox: https://enigma-toolbox.readthedocs.io/en/latest/ 
+
+## -- FSBrain : https://cran.r-project.org/web/packages/fsbrain/vignettes/fsbrain.html
 
 
 library(lme4)
