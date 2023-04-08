@@ -45,19 +45,19 @@ rm(Main_Assessment, Main_Assessment_Excluded)
 subjecttable <- read.csv("subject_table.csv")
 
 Main_Clean <- merge(Main_Assessment_Clean, 
-                               subjecttable[, c("subjectID", "name", "phone", "city", "state")], by="subjectID", all.x=T)
+                    subjecttable[, c("subjectID", "name", "phone", "city", "state")], by="subjectID", all.x=T)
 
 # Sociodemographic cleaning
 
 Sociodem <- read.csv("socio_demographic_details_table1.csv", header = T, na.strings = "NA")
 
 Sociodem_Excluded <- Sociodem[nchar(Sociodem$assessmentId) !=9 | 
-                                              Sociodem$subjectID >170000 | 
-                                              duplicated(Sociodem$assessmentId, fromLast = T), ]
+                                Sociodem$subjectID >170000 | 
+                                duplicated(Sociodem$assessmentId, fromLast = T), ]
 
 Sociodem_Clean <- Sociodem[nchar(Sociodem$assessmentId)==9 & 
-                                           Sociodem$subjectID <170000 & 
-                                           !duplicated(Sociodem$assessmentId, fromLast = T), ]
+                             Sociodem$subjectID <170000 & 
+                             !duplicated(Sociodem$assessmentId, fromLast = T), ]
 
 # Clean up the dates
 
@@ -135,10 +135,25 @@ Sociodem_Clean[,"Psy5"] <- as.factor(gsub("Â", "",Sociodem_Clean[,"Psy5"]))
 
 Sociodem_Clean$Category <- ifelse(Sociodem_Clean$subjectID > 160000, "PHC", ifelse(rowSums(select(Sociodem_Clean, starts_with("Diag_")))>0, "Affected", "Unaffected FDR"))
 
-Sociodem_Reqd <- Sociodem_Clean [,c("assessmentId", "P_NO", "Pt_Gender", "Pt_Age",  "NoEducation",
-                                    "Psy1","Psy2","Psy3","Psy4","Psy5", "AAO_Init", "AAO_Full", "AAO_FirstRx","Diag_Schiz","Diag_BPAD","Diag_OCD","Diag_SUD","Diag_AlzD", "Category")]
+# Adding the FHD/FDR scores
+
+FHD <- read.csv("FHD.csv")
+FDR <- read.csv("FDR.csv")
+
+Sociodem_Clean <- merge(Sociodem_Clean, FHD, by="subjectID", all.x=T)
+Sociodem_Clean <- merge(Sociodem_Clean, FDR, by="subjectID", all.x=T)
+names(Sociodem_Clean)
+
+Sociodem_Reqd <- Sociodem_Clean [,c("assessmentId", "P_NO", "Pt_Gender", "Pt_Age", "NoEducation",
+                                    "Psy1","Psy2","Psy3","Psy4","Psy5", "AAO_Init", "AAO_Full", "AAO_FirstRx",
+                                    "Diag_Schiz","Diag_BPAD","Diag_OCD","Diag_SUD","Diag_AlzD", 
+                                    "FHD_Schiz","FHD_BPAD","FHD_OCD","FHD_SUD","FHD_AlzD", 
+                                    "FDR_Schiz","FDR_BPAD","FDR_OCD","FDR_SUD","FDR_AlzD", 
+                                    "Category")]
+
 
 rm(Sociodem, Sociodem_Excluded)
+
 
 # --------------Getting sampleNos and FamilyIDs from the PBMC GoogleSheet-----------------#
 
@@ -167,7 +182,7 @@ PBMC_Duplicates_AssessId <- PBMC_Duplicates_AssessId[!(is.na(PBMC_Duplicates_Ass
 
 PBMC_Duplicates_SampleNo <- PBMC2[duplicated(PBMC2$sample_no) |  
                                     duplicated(PBMC2$sample_no, fromLast = T), ]
-                                    
+
 PBMC_Duplicates_SampleNo <- PBMC_Duplicates_SampleNo[!(is.na(PBMC_Duplicates_SampleNo$subjectID)), ]
 
 PBMC2 <- PBMC2[!is.na(PBMC2$sample_no),]
@@ -180,9 +195,11 @@ PBMC3 <- PBMC2[!duplicated(PBMC2$assessmentId) & !(is.na(PBMC2$assessmentId)),]
 Audit_Full <- merge(Main_Clean, PBMC3[,-2], by="assessmentId", all.x=T)
 
 Audit_Full <- Audit_Full  %>% dplyr::select("Cohort", "Family_Number", "subjectID", "D_Number", "assessmentId", 
-                                     "sample_no", "name", "phone", "city", "state", "Brief_Date", "Deep_Date")
+                                            "sample_no", "name", "phone", "city", "state", "Brief_Date", "Deep_Date")
 
 Audit_Full <- merge(Audit_Full, Sociodem_Reqd, by="assessmentId", all.x=T)
+
+
 
 
 # --------------- Removing the COVID Assessments ------------------ #
@@ -194,13 +211,13 @@ Phase1 <- Audit_Full[Audit_Full$assessmentId < 110000000, ]
 Phase2 <- Audit_Full[Audit_Full$assessmentId > 110000000,]
 
 Phase1$COVID_Assessment <- ifelse(Phase1$assessmentId > 102000000 &
-                                  Phase1$Brief_Date > COVID_Start &
-                                  Phase1$Brief_Date < COVID_End &
-                                           is.na(Phase1$sample_no), "Yes", "")
+                                    Phase1$Brief_Date > COVID_Start &
+                                    Phase1$Brief_Date < COVID_End &
+                                    is.na(Phase1$sample_no), "Yes", "")
 
 Phase2$COVID_Assessment <- ifelse(Phase2$assessmentId > 112000000 &
-                                  Phase2$Brief_Date > COVID_Start &
-                                  Phase2$Brief_Date < COVID_End &
+                                    Phase2$Brief_Date > COVID_Start &
+                                    Phase2$Brief_Date < COVID_End &
                                     is.na(Phase2$sample_no), "Yes", "")
 
 Phase1 <- Phase1[Phase1$COVID_Assessment != "Yes",]
