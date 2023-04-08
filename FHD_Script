@@ -112,38 +112,39 @@ colnames(df)
 
 df$FHD_SUD <-((df$PBSUD / (ifelse((rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])))))
               +(0.5*rowSums(df[, c("FatherSUD", "MotherSUD", "BrothersSUD", "SistersSUD", "SonsSUD", "DaughtersSUD"), ]))+ (0.25*rowSums(df[, c("Paternal_UnclesSUD", "Maternal_UnclesSUD","Paternal_AuntsSUD", "Maternal_AuntsSUD", "GrandFatherSUD", "GrandMotherSUD"),])))/
-              ((1/ ifelse(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))))+
-                  (0.5*rowSums(df[, c("Father", "Mother", "Brothers", "Sisters", "Sons", "Daughters"),])+0.25*rowSums(df[,c("Paternal_Uncles", "Maternal_Uncles", "Paternal_Aunts", "Maternal_Aunts","GrandFather", "GrandMother"),])))
+  ((1/ ifelse(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))))+
+     (0.5*rowSums(df[, c("Father", "Mother", "Brothers", "Sisters", "Sons", "Daughters"),])+0.25*rowSums(df[,c("Paternal_Uncles", "Maternal_Uncles", "Paternal_Aunts", "Maternal_Aunts","GrandFather", "GrandMother"),])))
 
 summary(df$FHD_SUD)
 
 
 df$FHD_BPAD <- ((df$PBBPAD / (ifelse((rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])))))
-            +(0.5*rowSums(df[, c("FatherBPAD", "MotherBPAD", "BrothersBPAD", "SistersBPAD", "SonsBPAD", "DaughtersBPAD"), ])+ 0.25*rowSums(df[, c("Paternal_UnclesBPAD", "Maternal_UnclesBPAD","Paternal_AuntsBPAD", "Maternal_AuntsBPAD", "GrandFatherBPAD", "GrandMotherBPAD"),])))/
-            ((1/ ifelse(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))))+
-           (0.5*rowSums(df[, c("Father", "Mother", "Brothers", "Sisters", "Sons", "Daughters"),])+0.25*rowSums(df[,c("Paternal_Uncles", "Maternal_Uncles", "Paternal_Aunts", "Maternal_Aunts","GrandFather", "GrandMother"),])))
+                +(0.5*rowSums(df[, c("FatherBPAD", "MotherBPAD", "BrothersBPAD", "SistersBPAD", "SonsBPAD", "DaughtersBPAD"), ])+ 0.25*rowSums(df[, c("Paternal_UnclesBPAD", "Maternal_UnclesBPAD","Paternal_AuntsBPAD", "Maternal_AuntsBPAD", "GrandFatherBPAD", "GrandMotherBPAD"),])))/
+  ((1/ ifelse(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))))+
+     (0.5*rowSums(df[, c("Father", "Mother", "Brothers", "Sisters", "Sons", "Daughters"),])+0.25*rowSums(df[,c("Paternal_Uncles", "Maternal_Uncles", "Paternal_Aunts", "Maternal_Aunts","GrandFather", "GrandMother"),])))
 
 summary(df$FHD_BPAD) 
 
-df$FHD_Alz_Dem <- ((df$PBAlz_Dem/ (ifelse((rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])))))
-                + (0.5*rowSums(df[, c("FatherAlz_Dem", "MotherAlz_Dem", "BrothersAlz_Dem", "SistersAlz_Dem", "SonsAlz_Dem", "DaughtersAlz_Dem"), ])+ 0.25*rowSums(df[, c("Paternal_UnclesAlz_Dem", "Maternal_UnclesAlz_Dem","Paternal_AuntsAlz_Dem", "Maternal_AuntsAlz_Dem", "GrandFatherAlz_Dem", "GrandMotherAlz_Dem"),])))/
+df$FHD_AlzD <- ((df$PBAlz_Dem/ (ifelse((rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])))))
+                   + (0.5*rowSums(df[, c("FatherAlz_Dem", "MotherAlz_Dem", "BrothersAlz_Dem", "SistersAlz_Dem", "SonsAlz_Dem", "DaughtersAlz_Dem"), ])+ 0.25*rowSums(df[, c("Paternal_UnclesAlz_Dem", "Maternal_UnclesAlz_Dem","Paternal_AuntsAlz_Dem", "Maternal_AuntsAlz_Dem", "GrandFatherAlz_Dem", "GrandMotherAlz_Dem"),])))/
   ((1/ ifelse(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))))+
      (0.5*rowSums(df[, c("Father", "Mother", "Brothers", "Sisters", "Sons", "Daughters"),])+0.25*rowSums(df[,c("Paternal_Uncles", "Maternal_Uncles", "Paternal_Aunts", "Maternal_Aunts","GrandFather", "GrandMother"),])))
-summary(df$FHD_Alz_Dem) 
+
+summary(df$FHD_AlzD) 
 
 df$FHD_OCD <- ((df$PBOCD/ (ifelse((rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])))))
-                + (0.5*rowSums(df[, c("FatherOCD", "MotherOCD", "BrothersOCD", "SistersOCD", "SonsOCD", "DaughtersOCD"), ])+ 0.25*rowSums(df[, c("Paternal_UnclesOCD", "Maternal_UnclesOCD","Paternal_AuntsOCD", "Maternal_AuntsOCD", "GrandFatherOCD", "GrandMotherOCD"),])))/
+               + (0.5*rowSums(df[, c("FatherOCD", "MotherOCD", "BrothersOCD", "SistersOCD", "SonsOCD", "DaughtersOCD"), ])+ 0.25*rowSums(df[, c("Paternal_UnclesOCD", "Maternal_UnclesOCD","Paternal_AuntsOCD", "Maternal_AuntsOCD", "GrandFatherOCD", "GrandMotherOCD"),])))/
   ((1/ ifelse(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))))+
      (0.5*rowSums(df[, c("Father", "Mother", "Brothers", "Sisters", "Sons", "Daughters"),])+0.25*rowSums(df[,c("Paternal_Uncles", "Maternal_Uncles", "Paternal_Aunts", "Maternal_Aunts","GrandFather", "GrandMother"),])))
 summary(df$FHD_OCD)
 
 df$FHD_Schiz <- ((df$PBSchiz/ (ifelse((rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])))))
-                +(0.5*rowSums(df[, c("FatherSchiz", "MotherSchiz", "BrothersSchiz", "SistersSchiz", "SonsSchiz", "DaughtersSchiz"), ])+ 0.25*rowSums(df[, c("Paternal_UnclesSchiz", "Maternal_UnclesSchiz","Paternal_AuntsSchiz", "Maternal_AuntsSchiz", "GrandFatherSchiz", "GrandMotherSchiz"),])))/
+                 +(0.5*rowSums(df[, c("FatherSchiz", "MotherSchiz", "BrothersSchiz", "SistersSchiz", "SonsSchiz", "DaughtersSchiz"), ])+ 0.25*rowSums(df[, c("Paternal_UnclesSchiz", "Maternal_UnclesSchiz","Paternal_AuntsSchiz", "Maternal_AuntsSchiz", "GrandFatherSchiz", "GrandMotherSchiz"),])))/
   ((1/ ifelse(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ])==0, 1,(rowSums(df[, c("PBSUD","PBBPAD", "PBAlz_Dem", "PBOCD","PBSchiz"), ]))))+
      (0.5*rowSums(df[, c("Father", "Mother", "Brothers", "Sisters", "Sons", "Daughters"),])+0.25*rowSums(df[,c("Paternal_Uncles", "Maternal_Uncles", "Paternal_Aunts", "Maternal_Aunts","GrandFather", "GrandMother"),])))
 summary(df$FHD_Schiz) 
 
-fhd <- df[, c("FHD_SUD", "FHD_BPAD", "FHD_Alz_Dem", "FHD_OCD", "FHD_Schiz")]
+fhd <- df[, c("FHD_SUD", "FHD_BPAD", "FHD_AlzD", "FHD_OCD", "FHD_Schiz")]
 
 pheatmap::pheatmap(as.matrix(fhd), cluster_rows = F, cluster_cols = F)
 
@@ -152,17 +153,17 @@ colnames(fhd)   <- c("subjectID", "FHD_SUD", "FHD_BPAD", "FHD_Alz_Dem", "FHD_OCD
 
 
 df$FDR_SUD <- ifelse(rowSums(df[,c("PBSUD","BrothersSUD","SistersSUD","FatherSUD", 
-                                "MotherSUD", "SonsSUD", "DaughtersSUD")])>0,1,0)
-df$FDR_Alz_Dem <- ifelse(rowSums(df[,c("PBAlz_Dem","BrothersAlz_Dem","SistersAlz_Dem","FatherAlz_Dem", 
-                                    "MotherAlz_Dem", "SonsAlz_Dem", "DaughtersAlz_Dem")])>0,1,0)
+                                   "MotherSUD", "SonsSUD", "DaughtersSUD")])>0,1,0)
+df$FDR_AlzD <- ifelse(rowSums(df[,c("PBAlz_Dem","BrothersAlz_Dem","SistersAlz_Dem","FatherAlz_Dem", 
+                                       "MotherAlz_Dem", "SonsAlz_Dem", "DaughtersAlz_Dem")])>0,1,0)
 df$FDR_OCD <- ifelse(rowSums(df[,c("PBOCD","BrothersOCD","SistersOCD","FatherOCD", 
-                                "MotherOCD", "SonsOCD", "DaughtersOCD")])>0,1,0)
+                                   "MotherOCD", "SonsOCD", "DaughtersOCD")])>0,1,0)
 df$FDR_BPAD <- ifelse(rowSums(df[,c("PBBPAD","BrothersBPAD","SistersBPAD","FatherBPAD", 
-                                 "MotherBPAD", "SonsBPAD", "DaughtersBPAD")])>0,1,0)
+                                    "MotherBPAD", "SonsBPAD", "DaughtersBPAD")])>0,1,0)
 df$FDR_Schiz <- ifelse(rowSums(df[,c("PBSchiz","BrothersSchiz","SistersSchiz","FatherSchiz", 
-                                  "MotherSchiz", "SonsSchiz", "DaughtersSchiz")])>0,1,0)
+                                     "MotherSchiz", "SonsSchiz", "DaughtersSchiz")])>0,1,0)
 
-FDR <- df[,c("ADBS_ID", "FDR_SUD","FDR_Alz_Dem","FDR_OCD","FDR_BPAD","FDR_Schiz")]
+FDR <- df[,c("ADBS_ID", "FDR_SUD","FDR_AlzD","FDR_OCD","FDR_BPAD","FDR_Schiz")]
 
 colnames(FDR)[1] <- "subjectID"
 
