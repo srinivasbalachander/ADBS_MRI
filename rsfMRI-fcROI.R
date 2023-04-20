@@ -1,3 +1,18 @@
+# Load important packages for parallel processing
+
+library(foreach)
+library(doParallel)
+
+
+# Specifications for parallel processing
+n.cores <- parallel::detectCores() - 4
+
+my.cluster <- parallel::makeCluster(n.cores, type = "PSOCK")
+doParallel::registerDoParallel(cl = my.cluster)
+foreach::getDoParRegistered()
+
+foreach::getDoParWorkers()
+
 
 # Make a few specifications for which atlas, type of motion/nuisance correction, etc
 
@@ -70,6 +85,9 @@ conmat.proc <- function(subj) {x <- read.table(Sys.glob(paste0("mats/sub-", subj
                             return (x2)
                               }
 
-# Do the analysis
+# Do the analysis - just an example to run in parallel
 
-
+foreach(i = conn.long$index) %dopar% {
+  j = sqrt(i)
+  print(j)
+}
